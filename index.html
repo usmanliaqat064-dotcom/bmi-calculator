@@ -5,40 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart BMI Calculator</title>
     <style>
-        /* Design Colors aur Layout */
+        :root {
+            /* Exact Colors from your image */
+            --primary-blue: #2D50C1;
+            --bg-gradient: linear-gradient(180deg, #E6EEFF 0%, #FFFFFF 100%);
+            --input-bg: #F5F7FA;
+            --text-grey: #6B7280;
+        }
+
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #E8F0FE; /* Background halka blue */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg-gradient);
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
         }
 
-        .main-container {
+        .container {
             background: white;
-            width: 90%;
-            max-width: 400px;
-            padding: 25px;
+            padding: 30px 20px;
             border-radius: 30px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.05);
+            width: 90%;
+            max-width: 380px;
             text-align: center;
         }
 
-        h2 {
-            color: #2D54B8; /* Royal Blue Title */
+        h1 {
+            color: var(--primary-blue);
             font-size: 24px;
-            font-weight: bold;
             margin-bottom: 25px;
+            font-weight: 800;
         }
 
-        /* Toggle Button Area */
+        /* Toggle Switches */
         .toggle-container {
-            background: #F0F2F5;
-            border-radius: 12px;
             display: flex;
-            padding: 5px;
+            background: #EDF2F7;
+            border-radius: 12px;
+            padding: 4px;
             margin-bottom: 25px;
         }
 
@@ -48,19 +55,20 @@
             border: none;
             border-radius: 10px;
             cursor: pointer;
-            font-weight: bold;
-            color: #666;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: var(--text-grey);
             background: transparent;
-            transition: 0.3s;
         }
 
         .toggle-btn.active {
-            background: #2D54B8; /* Active color */
+            background: var(--primary-blue);
             color: white;
+            box-shadow: 0 4px 10px rgba(45, 80, 193, 0.3);
         }
 
-        /* Input Styles */
-        .input-box {
+        /* Input Fields */
+        .input-group {
             text-align: left;
             margin-bottom: 15px;
         }
@@ -69,159 +77,166 @@
             display: block;
             font-weight: 600;
             margin-bottom: 8px;
-            color: #333;
+            font-size: 14px;
         }
 
         input {
             width: 100%;
             padding: 15px;
-            border: 1px solid #D1D5DB;
-            border-radius: 15px;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            background: var(--input-bg);
             font-size: 16px;
-            background: #F9FAFB;
             box-sizing: border-box;
         }
 
         /* Calculate Button */
-        .calculate-btn {
+        .calc-btn {
             width: 100%;
-            background: #2D54B8;
+            padding: 16px;
+            background: var(--primary-blue);
             color: white;
-            padding: 15px;
             border: none;
             border-radius: 15px;
             font-size: 18px;
-            font-weight: bold;
+            font-weight: 700;
             cursor: pointer;
-            margin: 20px 0;
-            box-shadow: 0 4px 10px rgba(45, 84, 184, 0.3);
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(45, 80, 193, 0.3);
         }
 
-        /* Result Display */
-        #result-display {
-            margin-top: 10px;
-            font-size: 18px;
-            font-weight: bold;
-            padding: 10px;
-            border-radius: 10px;
-            display: none;
-        }
-
-        /* Legend Grid (Bottom) */
+        /* Status Grid (Exact match to your UI) */
         .grid-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 20px;
+            gap: 12px;
+            margin-top: 30px;
         }
 
-        .grid-item {
+        .status-box {
             background: #F8FAFC;
-            padding: 10px;
-            border-radius: 10px;
+            padding: 12px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
-            font-size: 11px;
-            color: #444;
+            font-size: 12px;
+            color: #475569;
         }
 
         .dot {
-            height: 10px;
             width: 10px;
+            height: 10px;
             border-radius: 50%;
             margin-right: 8px;
         }
 
+        /* Result Display */
+        #result-display {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            display: none;
+            font-weight: bold;
+        }
+
         .footer-text {
-            font-size: 12px;
-            color: #999;
+            font-size: 11px;
+            color: #94A3B8;
             margin-top: 25px;
         }
     </style>
 </head>
 <body>
 
-<div class="main-container">
-    <h2>Smart BMI Calculator</h2>
+<div class="container">
+    <h1>Smart BMI Calculator</h1>
 
     <div class="toggle-container">
-        <button id="metricBtn" class="toggle-btn" onclick="toggleUnits('metric')">Metric (kg/cm)</button>
-        <button id="usBtn" class="toggle-btn active" onclick="toggleUnits('us')">US Standard (lbs/in)</button>
+        <button id="metricBtn" class="toggle-btn active" onclick="switchUnit('metric')">Metric (kg/cm)</button>
+        <button id="usBtn" class="toggle-btn" onclick="switchUnit('us')">US Standard (lbs/in)</button>
     </div>
 
-    <div class="input-box">
-        <label id="weightLabel">Weight (lbs)</label>
-        <input type="number" id="weightInput" placeholder="e.g. 154">
+    <div class="input-group">
+        <label id="weightLabel">Weight (kg)</label>
+        <input type="number" id="weight" placeholder="e.g. 70">
     </div>
 
-    <div class="input-box">
-        <label id="heightLabel">Height (in)</label>
-        <input type="number" id="heightInput" placeholder="e.g. 69">
+    <div class="input-group">
+        <label id="heightLabel">Height (cm)</label>
+        <input type="number" id="height" placeholder="e.g. 175">
     </div>
 
-    <button class="calculate-btn" onclick="calculate()">Calculate My BMI</button>
+    <button class="calc-btn" onclick="calculateBMI()">Calculate My BMI</button>
 
     <div id="result-display"></div>
 
     <div class="grid-container">
-        <div class="grid-item"><span class="dot" style="background:#3B82F6"></span> Underweight < 18.5</div>
-        <div class="grid-item"><span class="dot" style="background:#10B981"></span> Healthy 18.5 - 24.9</div>
-        <div class="grid-item"><span class="dot" style="background:#F59E0B"></span> Overweight 25 - 29.9</div>
-        <div class="grid-item"><span class="dot" style="background:#EF4444"></span> Obese > 30.0</div>
+        <div class="status-box"><span class="dot" style="background:#3B82F6"></span> Underweight < 18.5</div>
+        <div class="status-box"><span class="dot" style="background:#10B981"></span> Healthy 18.5-24.9</div>
+        <div class="status-box"><span class="dot" style="background:#F59E0B"></span> Overweight 25-29.9</div>
+        <div class="status-box"><span class="dot" style="background:#EF4444"></span> Obese > 30.0</div>
     </div>
 
     <p class="footer-text">BMI is a screening tool, not a medical diagnosis.</p>
 </div>
 
 <script>
-    let mode = 'us'; // Default mode
+    let unit = 'metric';
 
-    function toggleUnits(unit) {
-        mode = unit;
-        document.getElementById('metricBtn').classList.remove('active');
-        document.getElementById('usBtn').classList.remove('active');
-        
-        if(unit === 'metric') {
-            document.getElementById('metricBtn').classList.add('active');
-            document.getElementById('weightLabel').innerText = "Weight (kg)";
-            document.getElementById('heightLabel').innerText = "Height (cm)";
-            document.getElementById('weightInput').placeholder = "e.g. 70";
-            document.getElementById('heightInput').placeholder = "e.g. 175";
+    function switchUnit(selectedUnit) {
+        unit = selectedUnit;
+        const mBtn = document.getElementById('metricBtn');
+        const uBtn = document.getElementById('usBtn');
+        const wLabel = document.getElementById('weightLabel');
+        const hLabel = document.getElementById('heightLabel');
+
+        if (unit === 'metric') {
+            mBtn.classList.add('active');
+            uBtn.classList.remove('active');
+            wLabel.innerText = "Weight (kg)";
+            hLabel.innerText = "Height (cm)";
+            document.getElementById('weight').placeholder = "e.g. 70";
+            document.getElementById('height').placeholder = "e.g. 175";
         } else {
-            document.getElementById('usBtn').classList.add('active');
-            document.getElementById('weightLabel').innerText = "Weight (lbs)";
-            document.getElementById('heightLabel').innerText = "Height (in)";
-            document.getElementById('weightInput').placeholder = "e.g. 154";
-            document.getElementById('heightInput').placeholder = "e.g. 69";
+            uBtn.classList.add('active');
+            mBtn.classList.remove('active');
+            wLabel.innerText = "Weight (lbs)";
+            hLabel.innerText = "Height (in)";
+            document.getElementById('weight').placeholder = "e.g. 154";
+            document.getElementById('height').placeholder = "e.g. 69";
         }
     }
 
-    function calculate() {
-        let weight = parseFloat(document.getElementById('weightInput').value);
-        let height = parseFloat(document.getElementById('heightInput').value);
-        let resultDiv = document.getElementById('result-display');
+    function calculateBMI() {
+        const w = parseFloat(document.getElementById('weight').value);
+        const h = parseFloat(document.getElementById('height').value);
+        const resDiv = document.getElementById('result-display');
 
-        if(!weight || !height) {
-            alert("Meharbani karke dono values enter karein.");
+        if (!w || !h) {
+            alert("Please enter values!");
             return;
         }
 
         let bmi = 0;
-        if(mode === 'metric') {
-            // Formula: kg / (m * m)
-            let heightInMeters = height / 100;
-            bmi = weight / (heightInMeters * heightInMeters);
+        if (unit === 'metric') {
+            // Metric: kg / (m^2)
+            bmi = w / ((h / 100) * (h / 100));
         } else {
-            // Formula: (lbs / (in * in)) * 703
-            bmi = (weight / (height * height)) * 703;
+            // US: (lbs / in^2) * 703
+            bmi = (w / (h * h)) * 703;
         }
 
-        let finalBmi = bmi.toFixed(1);
-        resultDiv.style.display = "block";
-        resultDiv.innerHTML = "Aapka BMI: " + finalBmi;
+        const finalBmi = bmi.toFixed(1);
+        resDiv.style.display = "block";
+        resDiv.innerHTML = `Your BMI is: ${finalBmi}`;
+        
+        // Color coding result
+        if(finalBmi < 18.5) resDiv.style.color = "#3B82F6";
+        else if(finalBmi <= 24.9) resDiv.style.color = "#10B981";
+        else if(finalBmi <= 29.9) resDiv.style.color = "#F59E0B";
+        else resDiv.style.color = "#EF4444";
+    }
+</script>
 
-        // Result ke mutabiq colour change karna
-        if(finalBmi < 18.5) resultDiv.style.color = "#3B82F6";
-        else if(finalBmi < 25) resultDiv.style.color = "#10B981";
-        else if(finalBmi < 30) resultDiv.style.color = "#F59E0B";
-        else resultDiv.style.color = "#EF4444
+</body>
+</html>
