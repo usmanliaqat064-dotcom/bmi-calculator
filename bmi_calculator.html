@@ -1,0 +1,132 @@
+
+<style>
+  .bmi-wrap { padding: 2rem 1.5rem; max-width: 480px; margin: 0 auto; }
+  .bmi-title { font-size: 22px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 0.25rem; }
+  .bmi-sub { font-size: 14px; color: var(--color-text-secondary); margin: 0 0 2rem; }
+  .field { margin-bottom: 1.25rem; }
+  .field label { display: block; font-size: 13px; color: var(--color-text-secondary); margin-bottom: 6px; font-weight: 500; }
+  .input-row { display: flex; align-items: center; gap: 8px; }
+  .input-row input { flex: 1; }
+  .unit { font-size: 13px; color: var(--color-text-secondary); min-width: 24px; }
+  .calc-btn { width: 100%; margin-top: 1.5rem; padding: 10px; font-size: 15px; font-weight: 500; cursor: pointer;
+    background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary);
+    border-radius: var(--border-radius-md); color: var(--color-text-primary); transition: background 0.15s; }
+  .calc-btn:hover { background: var(--color-background-secondary); }
+  .calc-btn:active { transform: scale(0.98); }
+  .result-card { margin-top: 1.75rem; border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary);
+    background: var(--color-background-primary); padding: 1.5rem; }
+  .result-top { display: flex; align-items: flex-end; gap: 12px; margin-bottom: 1rem; }
+  .bmi-val { font-size: 48px; font-weight: 500; line-height: 1; }
+  .bmi-label-wrap { padding-bottom: 6px; }
+  .bmi-label { font-size: 18px; font-weight: 500; }
+  .bmi-desc { font-size: 13px; color: var(--color-text-secondary); margin-top: 2px; }
+  .scale-bar { height: 8px; border-radius: 4px; display: flex; overflow: hidden; margin-bottom: 0.5rem; gap: 2px; }
+  .seg { flex: 1; border-radius: 3px; }
+  .scale-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--color-text-secondary); }
+  .marker-row { display: flex; margin-top: 0.75rem; gap: 8px; flex-wrap: wrap; }
+  .badge { font-size: 12px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
+  .error { font-size: 13px; color: var(--color-text-danger); margin-top: 8px; }
+  .hidden { display: none; }
+</style>
+
+<div class="bmi-wrap">
+  <h2 class="sr-only">BMI Calculator — enter weight and height to see your Body Mass Index</h2>
+  <p class="bmi-title">BMI Calculator</p>
+  <p class="bmi-sub">Body Mass Index based on weight and height</p>
+
+  <div class="field">
+    <label for="weight">Weight</label>
+    <div class="input-row">
+      <input type="number" id="weight" min="1" max="500" placeholder="e.g. 70" step="0.1" />
+      <span class="unit">kg</span>
+    </div>
+  </div>
+
+  <div class="field">
+    <label for="height">Height</label>
+    <div class="input-row">
+      <input type="number" id="height" min="1" max="300" placeholder="e.g. 175" step="0.1" />
+      <span class="unit">cm</span>
+    </div>
+  </div>
+
+  <p class="error hidden" id="err">Please enter valid weight and height values.</p>
+
+  <button class="calc-btn" onclick="calculate()">Calculate BMI</button>
+
+  <div class="result-card hidden" id="result-card">
+    <div class="result-top">
+      <span class="bmi-val" id="bmi-num">—</span>
+      <div class="bmi-label-wrap">
+        <div class="bmi-label" id="bmi-cat">—</div>
+        <div class="bmi-desc" id="bmi-range">—</div>
+      </div>
+    </div>
+
+    <div class="scale-bar">
+      <div class="seg" style="flex:2.5; background:#85B7EB;"></div>
+      <div class="seg" style="flex:6.5; background:#97C459;"></div>
+      <div class="seg" style="flex:5; background:#EF9F27;"></div>
+      <div class="seg" style="flex:6; background:#E24B4A;"></div>
+    </div>
+    <div class="scale-labels">
+      <span>Under 18.5</span><span>18.5–25</span><span>25–30</span><span>30+</span>
+    </div>
+
+    <div class="marker-row">
+      <span class="badge" style="background:#E6F1FB;color:#0C447C;">Underweight &lt;18.5</span>
+      <span class="badge" style="background:#EAF3DE;color:#27500A;">Normal 18.5–25</span>
+      <span class="badge" style="background:#FAEEDA;color:#633806;">Overweight 25–30</span>
+      <span class="badge" style="background:#FCEBEB;color:#791F1F;">Obese 30+</span>
+    </div>
+  </div>
+</div>
+
+<script>
+function calculate() {
+  const wEl = document.getElementById('weight');
+  const hEl = document.getElementById('height');
+  const errEl = document.getElementById('err');
+  const card = document.getElementById('result-card');
+  const w = parseFloat(wEl.value);
+  const h = parseFloat(hEl.value);
+
+  if (!w || !h || w <= 0 || h <= 0) {
+    errEl.classList.remove('hidden');
+    card.classList.add('hidden');
+    return;
+  }
+  errEl.classList.add('hidden');
+
+  const hm = h / 100;
+  const bmi = w / (hm * hm);
+  const bmiRounded = bmi.toFixed(1);
+
+  let cat, range, color, bg;
+  if (bmi < 18.5) {
+    cat = 'Underweight'; range = 'BMI below 18.5';
+    color = '#0C447C'; bg = '#E6F1FB';
+  } else if (bmi < 25) {
+    cat = 'Normal weight'; range = 'BMI 18.5 – 24.9';
+    color = '#27500A'; bg = '#EAF3DE';
+  } else if (bmi < 30) {
+    cat = 'Overweight'; range = 'BMI 25 – 29.9';
+    color = '#633806'; bg = '#FAEEDA';
+  } else {
+    cat = 'Obese'; range = 'BMI 30 and above';
+    color = '#791F1F'; bg = '#FCEBEB';
+  }
+
+  document.getElementById('bmi-num').textContent = bmiRounded;
+  document.getElementById('bmi-num').style.color = color;
+  document.getElementById('bmi-cat').textContent = cat;
+  document.getElementById('bmi-cat').style.color = color;
+  document.getElementById('bmi-range').textContent = range;
+  document.getElementById('result-card').style.background = bg;
+  document.getElementById('result-card').style.borderColor = color + '44';
+  card.classList.remove('hidden');
+}
+
+document.getElementById('weight').addEventListener('keydown', e => e.key === 'Enter' && calculate());
+document.getElementById('height').addEventListener('keydown', e => e.key === 'Enter' && calculate());
+</script>
